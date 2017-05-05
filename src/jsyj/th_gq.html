@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" class="center">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <link rel="stylesheet" href="http://localhost/arcgis_js_api/3.18/esri/css/esri.css">
+
+    <link rel="stylesheet" href="../ace/css/bootstrap.css">
+    <link rel="stylesheet" href="../ace/css/ace.css">
+    <link rel="stylesheet" href="../ace/css/font-awesome.css">
+    <link rel="stylesheet" href="../ace/css/jquery-ui.css">
+    <link rel="stylesheet" href="../gis/minimal/blue.css" >
+    <link rel="stylesheet" href="../ace/css/bootstrap-table.min.css">
+    <link rel="stylesheet" href="../ace/css/ace-rtl.css" />
+    <link rel="stylesheet" href="../ace/css/ace-skins.css" />
+    <!--[if !IE]> -->
+    <script src="../ace/components/jquery/jquery.js"></script>
+<!-- <![endif]-->
+<!--[if IE]>
+    <script src="../ace/components/jquery.1x/jquery.js"></script>
+<![endif]-->
+    <script src="../ace/js/bootstrap.js" type="text/javascript"></script>
+    <script src="../echarts/echarts.min.js" type="text/javascript"></script>
+    <script src="../echarts/bmapBase.js" type="text/javascript"></script>
+    <script src="../echarts/bmap.min.js" type="text/javascript"></script>
+    <script src="../gis/icheck.min.js" type="text/javascript"></script>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="../ace/js/ace-extra.js" type="text/javascript"></script>
+    <script src="../ace/js/data/fuelux.tree-sampledata.js" type="text/javascript"></script>
+    <script src="../ace/js/bootstrap-treeview.min.js" type="text/javascript"></script>
+    <script src="../ace/js/fuelux.tree.min.js" type="text/javascript"></script>
+
+    <script src="../ace/js/bootstrap-table.js"></script>
+    <script src="../ace/js/bootstrap-table-zh-CN.min.js"></script>
+    <script src="http://localhost/arcgis_js_api/3.18/init.js"></script>
+    <script src="../data/slsz.js" type="text/javascript"></script>
+    <style>
+			html,body{
+                    width:100%;
+                    height:100%;
+            }
+		</style>
+</head>
+<body id="body">
+    <div id="mapDiv" style="height:100%;width:100%;">
+    </div>
+    <div id="maptool" style="display:none"></div>
+    <script src="../../result/build.js"></script>
+</body>
+</html>
+<script type="text/javascript">
+    GisModelConfig = {
+    baseInfoLayers:[
+      {
+         name   : '底图',
+         id : 'baseInfo_xzq',
+         url : "http://10.1.102.129:6080/arcgis/rest/services/taihu/th_basemap2/MapServer",
+         layerType:'',
+         useType:'basic',
+         visible:true,
+         contentType:'Polygon'
+      },{
+         name   : '太湖分区',
+         id : 'baseInfo_xzq1',
+         url : "http://10.1.102.129:6080/arcgis/rest/services/taihu/th_partition_blue/MapServer",
+         layerType:'',
+         useType:'basic',
+         visible:true,
+         contentType:'Polygon'
+      },{
+         name   : '人工测站',
+         id : 'baseInfo_xzq2',
+         url : "http://10.1.102.129:6080/arcgis/rest/services/taihu/th_rgcezhan/MapServer",
+         layerType:'',
+         visible:false,
+         useType:'',
+         contentType:'Point'
+      },{
+         name   : '主要河流',
+         id : 'baseInfo_xzq3',
+         url : "http://10.1.102.129:6080/arcgis/rest/services/taihu/th_river/MapServer",
+         layerType:'',
+         visible:false,
+         useType:'basic',
+         contentType:'Line'
+      },{
+         name   : '水功能一级区划',
+         id : 'baseInfo_xzq4',
+         url : "http://10.1.102.129:6080/arcgis/rest/services/taihu/th_sgnyijiquhua/MapServer",
+         layerType:'',
+         visible:false,
+         useType:'basic',
+         contentType:'Polygon'
+      },{
+         name   : '水利分区',
+         id : 'baseInfo_xzq5',
+         url : "http://10.1.102.129:6080/arcgis/rest/services/taihu/th_shuilifenqu/MapServer",
+         layerType:'',
+         visible:false,
+         useType:'basic',
+         contentType:'Polygon'
+      },{
+         name   : '水质测站',
+         id : 'baseInfo_xzq6',
+         url : "http://10.1.102.129:6080/arcgis/rest/services/taihu/th_szcezhan/MapServer",
+         layerType:'',
+         visible:false,
+         useType:'',
+         contentType:'Point'
+      }
+    ],
+        centerPt:[120.50,31.2],
+        xzqUrl : "http://10.1.102.129:6080/arcgis/rest/services/taihu/th_basemap/MapServer"
+  };
+    require(["esri/symbols/SimpleFillSymbol","esri/graphic","gowa/gisObject","esri/layers/FeatureLayer","esri/layers/GraphicsLayer","esri/toolbars/draw", "esri/geometry/geometryEngine","esri/graphicsUtils","esri/tasks/RelationParameters","esri/symbols/PictureMarkerSymbol",
+      "esri/tasks/GeometryService","esri/geometry/Polygon","esri/geometry/Point","dojo/domReady!"],
+    function(SimpleFillSymbol,Graphic,gisObject,FeatureLayer,GraphicsLayer,Draw,geometryEngine,graphicsUtils,RelationParameters,PictureMarkerSymbol,GeometryService,Polygon,Point){
+        newGisObject = new gisObject(GisModelConfig,'mapDiv',maptest);
+        newGisObject.initMap('mapDiv');
+});
+function maptest(){
+    newGisObject.mapObject.setLevel(2);
+    addGraphicLayer();
+}
+function addGraphicLayer(){
+    require(["esri/symbols/SimpleFillSymbol","esri/symbols/SimpleLineSymbol","esri/symbols/PictureMarkerSymbol",
+        "esri/tasks/QueryTask","esri/layers/GraphicsLayer","esri/tasks/FeatureSet","esri/graphic","esri/geometry/Point",
+        "dojo/_base/Color","esri/layers/FeatureLayer","esri/tasks/query","esri/config"],
+        function(SimpleFillSymbol,SimpleLineSymbol,PictureMarkerSymbol,QueryTask,
+            GraphicsLayer,FeatureSet,Graphic,Point,Color,FeatureLayer,Query,esriConfig){
+
+            //水质水量站
+            graphicsLayer_szsl = new GraphicsLayer();
+            graphicsLayer_szsl.id = "graphicsLayer_szsl";
+            graphicsLayer_szsl.visible = true;
+            newGisObject.addNewLayer('Point',graphicsLayer_szsl);
+            graphicsLayer_szsl.on("mouse-over",function(e){
+                sztooltip(e,"szsl");
+            });
+            //工情站
+            graphicsLayer_gq = new GraphicsLayer();
+            graphicsLayer_gq.id = "graphicsLayer_gq";
+            graphicsLayer_gq.visible = true;
+            newGisObject.addNewLayer('Point',graphicsLayer_gq);
+            graphicsLayer_gq.on("mouse-over",function(e){
+                sztooltip(e,"gq");
+            });
+            //取水点
+            graphicsLayer_qsd = new GraphicsLayer();
+            graphicsLayer_qsd.id = "graphicsLayer_qsd";
+            graphicsLayer_qsd.visible = true;
+            newGisObject.addNewLayer('Point',graphicsLayer_qsd);
+            graphicsLayer_qsd.on("mouse-over",function(e){
+                sztooltip(e,"qsd");
+            });
+
+            var symbol_slsz = new PictureMarkerSymbol('../assets/sz1.png',20,20);
+            var symbol_gq = new PictureMarkerSymbol('../assets/gq.png',10,10);
+            var symbol_qsd = new PictureMarkerSymbol('../assets/qsyh.png',20,20);
+            for(var i=0;i<test_slsz.length;i++){
+                var targetData = test_slsz[i];
+                var p = new Point(targetData.LGTD,targetData.LTTD);
+                var gra = new Graphic(p,symbol_slsz,targetData);
+                graphicsLayer_szsl.add(gra);                
+            }
+            for(var i=0;i<test_qsyh_base.length;i++){
+                var targetData = test_qsyh_base[i];
+                var p = new Point(targetData.LGTD,targetData.LTTD);
+                var gra = new Graphic(p,symbol_qsd,targetData);
+                graphicsLayer_qsd.add(gra);                
+            }
+            for(var i=0;i<test_slsz.length;i++){
+            	var targetData = test_slsz[i];
+                var p = new Point(targetData.LGTD,targetData.LTTD);
+                var gra;
+            	switch(i%5){
+            		case 1:
+            			gra = new Graphic(p,symbol_gq,targetData);
+            			graphicsLayer_gq.add(gra);
+            	}                 
+            }
+
+        });
+}
+function sztooltip(e,type){
+    $(tempNode).popover('destroy');
+    $('.popover').remove();
+    var tempNode = e.graphic.getNode();
+    var popContent = '';
+    popContent += '<div class=" widget-container-col ui-sortable" id="widget-container" >'
+    popContent += '<div class="widget-box ui-sortable-handle" id="widget-box-5" style="margin-bottom:0px;">'
+    popContent += '<div class="widget-header" style="height:30px">'
+    popContent += '<h5 class="widget-title smaller">'+e.graphic.attributes.STNM+'</h5>'
+
+    popContent += '<div class="widget-toolbar">'
+    popContent += '<a href="#" id="popup_close">'
+    popContent += '<i class="ace-icon fa fa-times"></i>'
+    popContent += '</a>'
+
+    popContent += '</div>'
+    popContent += '</div>'
+
+    popContent += '<div class="widget-body">'
+    popContent += '<div class="widget-main padding-6">'
+    popContent += '<div id="gqPopoverContent"></div>'
+    // popContent += getInsideContent(e.graphic.attributes);
+
+    popContent += '</div>'
+    popContent += '</div>'
+    popContent += '</div>'
+    popContent += '</div>'
+    // popContent = popContent + '<font style="color:#66b4dc;font-size:12px">点击测站显示详细信息'+ '</font><br>';
+    var template = '<div class="popover" role="tooltip" style="z-index:5;opacity:0.9;max-width:1000px;"><div class="arrow"></div><div class="popover-content" style="font-size:10.5px;padding:0px 0px 0px 0px;margin-top:-4px;"></div></div>';
+    $(tempNode).popover({
+        html:true,
+        placement:"auto",
+        template:template,
+        content:popContent,
+        container:'body'});
+    $(tempNode).popover('show');
+
+    $('#popup_close').on('click',function(e){
+        $(tempNode).popover('destroy');
+            $('.popover').remove();
+    });
+    popoverContent = new Vue({
+        el:'#gqPopoverContent',
+        template:'<popoverContent></popoverContent>',
+        components:{'popoverContent':window.vCompoment.gk_content,},
+        method:{
+
+        },
+        data:{
+            
+        }
+    });
+    
+}
+</script>
